@@ -1,10 +1,12 @@
 import express from 'express';
 import dotevn from 'dotenv';
+import order from './router/orderRoute.js';
 dotevn.config();
 
 const app = express();
 const PORT=process.env.PORT || 3000;
 
+app.use("/api/orders",order);
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
