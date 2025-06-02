@@ -17,13 +17,16 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center">
             <img
-              className="h-10 w-auto mr-2"
-              src="/logo-coffee.png"
+              className="h-10 w-auto mr-2 rounded-2xl"
+              src="/CoffeeLogo.jpg"
               alt="Coffee Logo"
             />
-            <span className="font-bold text-xl tracking-wide">
-              BeanBrew
-            </span>
+            <img
+              className="h-9 w-32 mr-2 rounded-md"
+              src="/coffeeName.jpg"
+              alt="Coffee Name"
+            />
+            
           </div>
 
           {/* Menu items */}
