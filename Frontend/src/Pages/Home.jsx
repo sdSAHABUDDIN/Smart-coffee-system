@@ -1,11 +1,11 @@
 import React from "react";
 import Navbar from "../Components/Navbar.jsx";
-// import coffeeList from "../constants/coffeeList.js";
+import { Link } from "react-router-dom";
 import { coffeeList, facility } from "../constants/index.js";
 const Home = () => {
   return (
     <div className="bg-[FDF3DE] min-h-screen">
-      <Navbar />
+      
 
       {/* Hero Section */}
       <section className=" bg-[#FCF3DE] flex flex-col-reverse md:flex-row items-center justify-between max-w-7xl mx-auto px-6 py-20 gap-10">
@@ -22,12 +22,12 @@ const Home = () => {
             with our automated coffee solution.
           </p>
 
-          <a
-            href="#products"
+          <Link
+            to="/prepare"
             className="bg-amber-600 text-white px-6 py-3 rounded-2xl shadow hover:bg-amber-500 transition"
           >
             Prepare Your Daily Brew
-          </a>
+          </Link>
         </div>
         <div className="md:w-1/2">
           <img
@@ -41,7 +41,7 @@ const Home = () => {
       {/* Coffee Types Scroll Section */}
       <section className="overflow-hidden py-12">
         <h2 className="text-2xl font-bold text-center text-[#3e2c23] mb-6">
-          Explore Our Coffee Varieties
+          Explore Coffee Varieties
         </h2>
 
         <div className="relative w-full">
@@ -69,25 +69,26 @@ const Home = () => {
       <section className="bg-[#FCF3DE] py-16" id="products">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-[#3e2c23] mb-12">
-            Why Choose  <span className="text-amber-600">CAFFEiQ</span> ?
+            Why Choose <span className="text-amber-600">CAFFEiQ</span> ?
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-10 text-center">
-            {facility.map((fac)=>(
-            <div key={fac.id} className="bg-white p-6 rounded-2xl shadow hover:shadow-xl transition">
-              <img
-                src={fac.img}
-                alt="Auto Brew"
-                className="h-15 mx-auto mb-4"
-              />
-              <h3 className="text-xl font-semibold text-[#3e2c23]">
-                {fac.title}
-              </h3>
-              <p className="text-gray-600 mt-2">
-                {fac.des}
-              </p>
-            </div>
-          ))}
+            {facility.map((fac) => (
+              <div
+                key={fac.id}
+                className="bg-white p-6 rounded-2xl shadow hover:shadow-xl transition"
+              >
+                <img
+                  src={fac.img}
+                  alt="Auto Brew"
+                  className="h-15 mx-auto mb-4"
+                />
+                <h3 className="text-xl font-semibold text-[#3e2c23]">
+                  {fac.title}
+                </h3>
+                <p className="text-gray-600 mt-2">{fac.des}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -99,12 +100,12 @@ const Home = () => {
           Find your perfect coffee companion and start brewing joy at home
           today.
         </p>
-        <a
-          href="#"
+        <Link
+          to="/Machine"
           className="bg-white text-amber-600 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-100 transition"
         >
           Shop Now
-        </a>
+        </Link>
       </section>
     </div>
   );

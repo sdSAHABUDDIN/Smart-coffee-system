@@ -1,4 +1,4 @@
-import {Americano,Cappuccino,CaramelMacchiato, ColdBrew, Hazelnut, IcedAmericano, IcedMocha,VanillaLatte, IcedCoffee,AutoBrew,PerfectTemp,CleanSystem} from "../assets"
+import {Americano,Cappuccino,CaramelMacchiato, ColdBrew, Hazelnut, IcedAmericano, IcedMocha,VanillaLatte, AutoBrew,PerfectTemp,CleanSystem,machine1,machine2,machine3,machine4,shop1,shop2,shop3,shop4,new1,new2} from "../assets"
 
 export const coffeeList=[
   {
@@ -41,11 +41,7 @@ export const coffeeList=[
     name:"VanillaLatte",
     img:VanillaLatte,
   },
-  {
-    id:9,
-    name:"Iced Coffee",
-    img:IcedCoffee,
-  }
+ 
 ]
 
 export const facility=[
@@ -67,4 +63,103 @@ export const facility=[
     title:"Easy Cleaning",
     des:"Built-in cleaning system that keeps your machine fresh and ready.",
   },
+]
+export const machine=[
+  {
+    id:1,
+    img:machine1,
+    OriginalPrice:22000,
+    DiscountPrice:19000,
+
+  },
+  {
+    id:2,
+    img:machine2,
+    OriginalPrice:24000,
+    DiscountPrice:20000,
+    
+  },
+  {
+    id:3,
+    img:machine3,
+    OriginalPrice:30000,
+    DiscountPrice:24000,
+    
+  }
+  ,{
+    id:1,
+    img:machine1,
+    OriginalPrice:26000,
+    DiscountPrice:23000,
+    
+  }
+]
+export const thumbnail=[
+  {
+    id:1,
+    img:machine1
+  },
+   {
+    id:2,
+    img:machine2
+  },
+   {
+    id:3,
+    img:machine3
+  },
+   {
+    id:4,
+    img:machine4
+  }
+]
+export const shop=[
+  {
+    id:1,
+    img:shop1,
+    Add:"Andheri, Mumbai, Maharashtra",
+    time:"8:00AM-10PM"
+  },
+  {
+    id:1,
+    img:shop1,
+    Add:"Andheri, Mumbai, Maharashtra",
+    time:"8:00AM-10PM"
+  },
+  {
+    id:2,
+    img:shop2,
+    Add:"Indiranagar, Bengaluru, Karnataka",
+    time:"8:00AM-10PM"
+  },
+  {
+    id:3,
+    img:shop3,
+    Add:"Maninagar, Ahmedabad, Gujarat",
+    time:"8:00AM-10PM"
+  },
+  {
+    id:4,
+    img:shop4,
+    Add:"Navrangpura, Ahmedabad, Gujarat",
+    time:"8:00AM-10PM"
+  },
+]
+
+export const Whatsnew=[
+  {
+    id:1,
+    img:new1,
+    title:"New Seasonal Flavors Released!",
+    date:"June 1, 2025",
+    desc:"Try our new Honey Almond Latte and Choco-Cinnamon Cold Brew this summer."
+  },
+   {
+    id:2,
+    img:new2,
+    title:"Introducing Loyalty Rewards",
+    date:"May 10, 2025",
+    desc:"Earn beans for every brew and redeem exciting rewards!"
+  },
+   
+
 ]
