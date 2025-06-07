@@ -1,78 +1,84 @@
 // src/pages/Prepare.jsx
 import React, { useEffect, useState } from "react";
-import { coffeeList } from "../constants";4
-import axios from "axios"
+import { coffeeList } from "../constants";
+4;
+import axios from "axios";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 const Prepare = () => {
-  const [step,setStep]=useState("Idle");
-  const [polling,setPolling]=useState(false);
+  const [step, setStep] = useState("Idle");
+  const [polling, setPolling] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
   // const [brewing, setBrewing] = useState(false);
   const [progress, setProgess] = useState(0);
   // const [completed, setCompleted] = useState(false);
   useEffect(() => {
     let pollInterval;
-    if(polling){
-      pollInterval=setInterval(async()=>{
-        const res=await axios.get("http://localhost:3000/api/brew/status");
+    if (polling) {
+      pollInterval = setInterval(async () => {
+        const res = await axios.get("http://localhost:3000/api/brew/status");
         setStep(res.data.status);
-
-      },1000);
+      }, 1000);
     }
-    return ()=>clearInterval(pollInterval);
+    return () => clearInterval(pollInterval);
   }, [polling]);
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const handleBrew =async () => {
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const handleBrew = async () => {
     setPolling(true);
-    //step 1: connect
-    await axios.post("/api/brew/step",{step:"connecting to ESP32"});
-    await delay(5000);
-    //step 2: start Brewing
-    await axios.post("/api/brew/step",{step:"Brewing"});
-    await delay(5000);
+    setCancelled(false); // Reset cancel flag
 
-    //step 3: wait for cup
-    await axios.post("/api/brew/step",{step:"Waiting for cup"});
+    // step 1: connect
+    await axios.post("/api/brew/step", { step: "Connecting to ESP32" });
+    await delay(5000);
+    if (cancelled) return; // Stop if cancelled
+
+    // step 2: start Brewing
+    await axios.post("/api/brew/step", { step: "Brewing" });
+    await delay(5000);
+    if (cancelled) return; // Stop if cancelled
+
+    // step 3: wait for cup
+    await axios.post("/api/brew/step", { step: "Waiting for cup" });
     setProgess(0);
-    let progInterval=setInterval(()=>{
-      setProgess((prev)=>{
-        const next=prev+5;
-        if(next>=100){
+    let progInterval = setInterval(() => {
+      setProgess((prev) => {
+        const next = prev + 5;
+        if (next >= 100) {
           clearInterval(progInterval);
         }
         return next;
       });
-    },250);//
+    }, 250);
     await delay(5000);
+  
 
-    //step 4:Take coffee
-    await axios.post("/api/brew/step",{step:"Take coffee"});
-    // setBrewing(true);
-    // setProgess(0);
-    // setCompleted(false);
+    // step 4: Take coffee
+    await axios.post("/api/brew/step", { step: "Take coffee" });
   };
-  const handleDone=async()=>{
-    await axios.post('/api/brew/step',{step:"Idle"});
+
+  const handleDone = async () => {
+    await axios.post("/api/brew/step", { step: "Idle" });
     setPolling(false);
     setProgess(0);
     setStep("Idle");
-  }
-  const handleCancel = async() => {
+  };
+  const handleCancel = async () => {
     // setBrewing(false);
     // setProgess(0);
     // setCompleted(false);
-    await axios.post("/api/brew/step",{step:"Idle"});
+    await axios.post("/api/brew/step", { step: "Idle" });
     setPolling(false);
     setProgess(0);
     setStep("Idle");
-
+    setCancelled(true); // Mark as cancelled
   };
 
   //UI rendering pre step
-  const renderContent=()=>{
-    switch(step){
+  const renderContent = () => {
+    switch (step) {
       case "Connecting to ESP32":
         return (
           <div className="flex flex-col lg:flex-row items-center gap-8">
@@ -96,24 +102,24 @@ const Prepare = () => {
                   <div className="flex gap-4">
                     <button
                       className="bg-gray-400 text-white px-5 py-2 rounded-full shadow cursor-not-allowed"
-                      disabled >
-                      Processing...
+                      disabled
+                    >
+                      Connecting...
                     </button>
                     <button
-                    onClick={handleCancel}
-                    className='px-5 py-2 rounded-full shadow transition
-                      bg-red-600 text-white hover:bg-red-500'
-                  >
-                    Cancel
-                  </button>
+                      onClick={handleCancel}
+                      className="px-5 py-2 rounded-full shadow transition
+                      bg-red-600 text-white hover:bg-red-500"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
-                
               </>
             </div>
           </div>
         );
-      case  "Brewing":
+      case "Brewing":
         return (
           <div className="flex flex-col lg:flex-row items-center gap-8">
             <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
@@ -136,28 +142,28 @@ const Prepare = () => {
                   <div className="flex gap-4">
                     <button
                       className="bg-gray-400 text-white px-5 py-2 rounded-full shadow cursor-not-allowed"
-                      disabled >
+                      disabled
+                    >
                       Brewing...
                     </button>
                     <button
-                    onClick={handleCancel}
-                    className='px-5 py-2 rounded-full shadow transition
-                      bg-red-600 text-white hover:bg-red-500'
-                  >
-                    Cancel
-                  </button>
+                      onClick={handleCancel}
+                      className="px-5 py-2 rounded-full shadow transition
+                      bg-red-600 text-white hover:bg-red-500"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
-                
               </>
             </div>
           </div>
-        )
+        );
       case "Waiting for cup":
-        return(
+        return (
           <div className="flex flex-col lg:flex-row items-center gap-8">
             <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
-             <video autoPlay muted loop className="w-full h-full object-cover">
+              <video autoPlay muted loop className="w-full h-full object-cover">
                 <source src="coffeePrepare.mp4" />
                 Your browser does not support the video tag.
               </video>
@@ -173,31 +179,30 @@ const Prepare = () => {
                 </p>
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-24 h-24">
-                  <CircularProgressbar
-                    value={progress}
-                    text={`${progress}%`}
-                    styles={buildStyles({
-                      textColor: "#3e2c23",
-                      pathColor: "#D69456",
-                      trailColor: "#fff5eb",
-                    })}
-                  />
-                </div>
+                    <CircularProgressbar
+                      value={progress}
+                      text={`${progress}%`}
+                      styles={buildStyles({
+                        textColor: "#3e2c23",
+                        pathColor: "#D69456",
+                        trailColor: "#fff5eb",
+                      })}
+                    />
+                  </div>
                   <div className="flex gap-4">
                     <button
                       className="bg-gray-400 text-white px-5 py-2 rounded-full shadow cursor-not-allowed"
-                      disabled >
+                      disabled
+                    >
                       wait for cup...
                     </button>
-                    
                   </div>
                 </div>
-                
               </>
             </div>
           </div>
-        )
-      case "take coffee":
+        );
+      case "Take coffee":
         return (
           <div className="flex flex-col lg:flex-row items-center gap-8">
             <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
@@ -219,20 +224,18 @@ const Prepare = () => {
                 <div className="flex flex-col items-center gap-4">
                   <div className="flex gap-4">
                     <button
-                    onClick={handleDone}
-                      className="bg-gray-400 text-white px-5 py-2 rounded-full shadow cursor-not-allowed"
-                      disabled >
+                      onClick={handleDone}
+                      className="bg-green-600 text-white px-5 py-2 rounded-full shadow hover:bg-green-500 transition"
+                    >
                       Done
                     </button>
-                    
                   </div>
                 </div>
-                
               </>
             </div>
           </div>
-        )
-      default :
+        );
+      default:
         return (
           <div className="flex flex-col lg:flex-row items-center gap-8">
             <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
@@ -260,13 +263,12 @@ const Prepare = () => {
               </>
             </div>
           </div>
-
-        )
+        );
     }
-  }
-  
-/*{Media Area }*/
-/*
+  };
+
+  /*{Media Area }*/
+  /*
           
             {!brewing ? (
               
@@ -324,7 +326,7 @@ const Prepare = () => {
     <div className="bg-[#FCF3DE]  min-h-screen p-6">
       {/* Section 1: Daily Chosen Flavour */}
       <section className="bg-gradient-to-r from-[#FFCA99] via-[#f6c389] to-[#FFCA99] rounded-xl shadow-lg p-6 mb-8">
-          {renderContent()}
+        {renderContent()}
       </section>
 
       {/* Section 2: Flavours for Everyone */}
