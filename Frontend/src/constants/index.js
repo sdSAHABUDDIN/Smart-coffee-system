@@ -116,30 +116,28 @@ export const shop=[
   {
     id:1,
     img:shop1,
-    Add:"Andheri, Mumbai, Maharashtra",
-    time:"8:00AM-10PM"
-  },
-  {
-    id:1,
-    img:shop1,
+    name:"Coffee house",
     Add:"Andheri, Mumbai, Maharashtra",
     time:"8:00AM-10PM"
   },
   {
     id:2,
     img:shop2,
+    name:"Coffee house",
     Add:"Indiranagar, Bengaluru, Karnataka",
     time:"8:00AM-10PM"
   },
   {
     id:3,
     img:shop3,
+    name:"Coffee house",
     Add:"Maninagar, Ahmedabad, Gujarat",
     time:"8:00AM-10PM"
   },
   {
     id:4,
     img:shop4,
+    name:"Coffee house",
     Add:"Navrangpura, Ahmedabad, Gujarat",
     time:"8:00AM-10PM"
   },

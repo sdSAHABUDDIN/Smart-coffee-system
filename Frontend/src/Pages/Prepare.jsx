@@ -1,71 +1,248 @@
 // src/pages/Prepare.jsx
 import React, { useEffect, useState } from "react";
-import { coffeeList } from "../constants";
+import { coffeeList } from "../constants";4
+import axios from "axios"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 const Prepare = () => {
-  const [brewing, setBrewing] = useState(false);
+  const [step,setStep]=useState("Idle");
+  const [polling,setPolling]=useState(false);
+  // const [brewing, setBrewing] = useState(false);
   const [progress, setProgess] = useState(0);
-  const [completed, setCompleted] = useState(false);
+  // const [completed, setCompleted] = useState(false);
   useEffect(() => {
-    let timer;
-    if (brewing && progress < 100) {
-      timer = setInterval(() => {
-        setProgess((prev) => {
-          const next = prev + 1;
-          if (next >= 100) {
-            clearInterval(timer);
-            setCompleted(true);
-            return 100;
-          }
-          return next;
-        });
-      }, 100);
+    let pollInterval;
+    if(polling){
+      pollInterval=setInterval(async()=>{
+        const res=await axios.get("http://localhost:3000/api/brew/status");
+        setStep(res.data.status);
+
+      },1000);
     }
-    return () => clearInterval(timer);
-  }, [brewing, progress]);
-  const handleBrew = () => {
-    setBrewing(true);
+    return ()=>clearInterval(pollInterval);
+  }, [polling]);
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const handleBrew =async () => {
+    setPolling(true);
+    //step 1: connect
+    await axios.post("/api/brew/step",{step:"connecting to ESP32"});
+    await delay(5000);
+    //step 2: start Brewing
+    await axios.post("/api/brew/step",{step:"Brewing"});
+    await delay(5000);
+
+    //step 3: wait for cup
+    await axios.post("/api/brew/step",{step:"Waiting for cup"});
     setProgess(0);
-    setCompleted(false);
+    let progInterval=setInterval(()=>{
+      setProgess((prev)=>{
+        const next=prev+5;
+        if(next>=100){
+          clearInterval(progInterval);
+        }
+        return next;
+      });
+    },250);//
+    await delay(5000);
+
+    //step 4:Take coffee
+    await axios.post("/api/brew/step",{step:"Take coffee"});
+    // setBrewing(true);
+    // setProgess(0);
+    // setCompleted(false);
   };
-  const handleCancel = () => {
-    setBrewing(false);
+  const handleDone=async()=>{
+    await axios.post('/api/brew/step',{step:"Idle"});
+    setPolling(false);
     setProgess(0);
-    setCompleted(false);
+    setStep("Idle");
+  }
+  const handleCancel = async() => {
+    // setBrewing(false);
+    // setProgess(0);
+    // setCompleted(false);
+    await axios.post("/api/brew/step",{step:"Idle"});
+    setPolling(false);
+    setProgess(0);
+    setStep("Idle");
+
   };
 
-  return (
-    <div className="bg-[#FCF3DE]  min-h-screen p-6">
-      {/* Section 1: Daily Chosen Flavour */}
-      <section className="bg-gradient-to-r from-[#FFCA99] via-[#f6c389] to-[#FFCA99] rounded-xl shadow-lg p-6 mb-8">
-        <div className="flex flex-col lg:flex-row items-center gap-8">
-          {/* Media Area */}
-          <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
-            {!brewing ? (
+  //UI rendering pre step
+  const renderContent=()=>{
+    switch(step){
+      case "Connecting to ESP32":
+        return (
+          <div className="flex flex-col lg:flex-row items-center gap-8">
+            <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
               <img
                 src="coffee2.jpg"
                 alt="Daily Flavour"
                 className="w-full h-full object-cover"
               />
-            ) : completed ? (
+            </div>
+            <div className="w-full lg:w-1/2 text-center lg:text-left">
+              <>
+                <h2 className="text-3xl font-bold text-[#3e2c23] mb-3">
+                  Today's Pick: Latte
+                </h2>
+                <p className="text-[#3e2c23] mb-4">
+                  Start your day with the smooth richness of freshly brewed
+                  Latte.
+                </p>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex gap-4">
+                    <button
+                      className="bg-gray-400 text-white px-5 py-2 rounded-full shadow cursor-not-allowed"
+                      disabled >
+                      Processing...
+                    </button>
+                    <button
+                    onClick={handleCancel}
+                    className='px-5 py-2 rounded-full shadow transition
+                      bg-red-600 text-white hover:bg-red-500'
+                  >
+                    Cancel
+                  </button>
+                  </div>
+                </div>
+                
+              </>
+            </div>
+          </div>
+        );
+      case  "Brewing":
+        return (
+          <div className="flex flex-col lg:flex-row items-center gap-8">
+            <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
               <img
-                src="coffee3.jpg"
-                alt="Brew Complete"
+                src="coffee2.jpg"
+                alt="Daily Flavour"
                 className="w-full h-full object-cover"
               />
-            ) : (
-              <video autoPlay muted loop className="w-full h-full object-cover">
+            </div>
+            <div className="w-full lg:w-1/2 text-center lg:text-left">
+              <>
+                <h2 className="text-3xl font-bold text-[#3e2c23] mb-3">
+                  Today's Pick: Latte
+                </h2>
+                <p className="text-[#3e2c23] mb-4">
+                  Start your day with the smooth richness of freshly brewed
+                  Latte.
+                </p>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex gap-4">
+                    <button
+                      className="bg-gray-400 text-white px-5 py-2 rounded-full shadow cursor-not-allowed"
+                      disabled >
+                      Brewing...
+                    </button>
+                    <button
+                    onClick={handleCancel}
+                    className='px-5 py-2 rounded-full shadow transition
+                      bg-red-600 text-white hover:bg-red-500'
+                  >
+                    Cancel
+                  </button>
+                  </div>
+                </div>
+                
+              </>
+            </div>
+          </div>
+        )
+      case "Waiting for cup":
+        return(
+          <div className="flex flex-col lg:flex-row items-center gap-8">
+            <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
+             <video autoPlay muted loop className="w-full h-full object-cover">
                 <source src="coffeePrepare.mp4" />
                 Your browser does not support the video tag.
               </video>
-            )}
+            </div>
+            <div className="w-full lg:w-1/2 text-center lg:text-left">
+              <>
+                <h2 className="text-3xl font-bold text-[#3e2c23] mb-3">
+                  Wait for your cup.
+                </h2>
+                <p className="text-[#3e2c23] mb-4">
+                  Start your day with the smooth richness of freshly brewed
+                  Latte.
+                </p>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-24 h-24">
+                  <CircularProgressbar
+                    value={progress}
+                    text={`${progress}%`}
+                    styles={buildStyles({
+                      textColor: "#3e2c23",
+                      pathColor: "#D69456",
+                      trailColor: "#fff5eb",
+                    })}
+                  />
+                </div>
+                  <div className="flex gap-4">
+                    <button
+                      className="bg-gray-400 text-white px-5 py-2 rounded-full shadow cursor-not-allowed"
+                      disabled >
+                      wait for cup...
+                    </button>
+                    
+                  </div>
+                </div>
+                
+              </>
+            </div>
           </div>
-
-          {/* Text + Buttons */}
-          <div className="w-full lg:w-1/2 text-center lg:text-left">
-            {!brewing ? (
+        )
+      case "take coffee":
+        return (
+          <div className="flex flex-col lg:flex-row items-center gap-8">
+            <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
+              <img
+                src="coffee3.jpg"
+                alt="Daily Flavour"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="w-full lg:w-1/2 text-center lg:text-left">
+              <>
+                <h2 className="text-3xl font-bold text-[#3e2c23] mb-3">
+                  Please Take your coffee .
+                </h2>
+                <p className="text-[#3e2c23] mb-4">
+                  Start your day with the smooth richness of freshly brewed
+                  Latte.
+                </p>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex gap-4">
+                    <button
+                    onClick={handleDone}
+                      className="bg-gray-400 text-white px-5 py-2 rounded-full shadow cursor-not-allowed"
+                      disabled >
+                      Done
+                    </button>
+                    
+                  </div>
+                </div>
+                
+              </>
+            </div>
+          </div>
+        )
+      default :
+        return (
+          <div className="flex flex-col lg:flex-row items-center gap-8">
+            <div className="w-full lg:w-1/2 h-[350px] rounded-lg overflow-hidden shadow-md">
+              <img
+                src="coffee2.jpg"
+                alt="Daily Flavour"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="w-full lg:w-1/2 text-center lg:text-left">
               <>
                 <h2 className="text-3xl font-bold text-[#3e2c23] mb-3">
                   Today's Pick: Latte
@@ -81,19 +258,36 @@ const Prepare = () => {
                   Brew This Flavour
                 </button>
               </>
+            </div>
+          </div>
+
+        )
+    }
+  }
+  
+/*{Media Area }*/
+/*
+          
+            {!brewing ? (
+              
+            ) : completed ? (
+              <img
+                src="coffee3.jpg"
+                alt="Brew Complete"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              
+            )}
+          </div>
+
+          { Text + Buttons }
+          
+            {!brewing ? (
+              
             ) : (
               <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24">
-                  <CircularProgressbar
-                    value={progress}
-                    text={`${progress}%`}
-                    styles={buildStyles({
-                      textColor: "#3e2c23",
-                      pathColor: "#D69456",
-                      trailColor: "#fff5eb",
-                    })}
-                  />
-                </div>
+                
                 <div className="flex gap-4">
                   {completed ? (
                     <button
@@ -125,7 +319,12 @@ const Prepare = () => {
               </div>
             )}
           </div>
-        </div>
+   */
+  return (
+    <div className="bg-[#FCF3DE]  min-h-screen p-6">
+      {/* Section 1: Daily Chosen Flavour */}
+      <section className="bg-gradient-to-r from-[#FFCA99] via-[#f6c389] to-[#FFCA99] rounded-xl shadow-lg p-6 mb-8">
+          {renderContent()}
       </section>
 
       {/* Section 2: Flavours for Everyone */}

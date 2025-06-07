@@ -42,7 +42,7 @@ const Navbar = () => {
               </button>
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-[#3e2c23] rounded-xl shadow-lg z-50">
-                  <Link to="/login" className="block px-4 py-2 hover:bg-amber-100">Login / Signup</Link>
+                  <Link to="/Login" className="block px-4 py-2 hover:bg-amber-100">Login / Signup</Link>
                   <Link to="/profile" className="block px-4 py-2 hover:bg-amber-100">My Profile</Link>
                   <Link to="/wishlist" className="block px-4 py-2 hover:bg-amber-100">Wishlist</Link>
                   <Link to="/notifications" className="block px-4 py-2 hover:bg-amber-100">Notifications</Link>

@@ -103,10 +103,10 @@ const Location = () => {
 
   <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
     {/* Shop Card */}
-    {}
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden transition transform hover:scale-105">
+    {shop.map((item)=>(
+      <div key={item.id} className="bg-white rounded-xl shadow-lg overflow-hidden transition transform hover:scale-105">
       <img
-        src="/shopper.jpg"
+        src={item.img}
         alt="Coffee Shop"
         className="w-full h-48 object-cover"
       />
@@ -114,13 +114,13 @@ const Location = () => {
       <div className="p-4 space-y-3">
         {/* Name & Time Row */}
         <div className="flex justify-between items-center">
-          <h4 className="text-lg font-bold text-[#3e2c23]">Café Brew Heaven</h4>
-          <span className="text-sm text-gray-500">9:00 AM – 9:00 PM</span>
+          <h4 className="text-lg font-bold text-[#3e2c23]">{item.name}</h4>
+          <span className="text-sm text-gray-500">{item.time}</span>
         </div>
 
         {/* Address Row */}
         <p className="text-gray-700 text-sm">
-          123 Coffee Street, Brewtown, India
+          {item.Add}
         </p>
 
         {/* Call & Direction Buttons */}
@@ -139,6 +139,8 @@ const Location = () => {
         </button>
       </div>
     </div>
+    ))}
+    
   </div>
 </section>
 
