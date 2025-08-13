@@ -1,0 +1,32 @@
+name: Deploy Vite Frontend to GitHub Pages
+
+on:
+  push:
+    branches: [main] # Runs when you push to main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repo code
+      - uses: actions/checkout@v3
+
+      # Step 2: Setup Node.js
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Step 3: Install frontend dependencies
+      - run: npm ci
+        working-directory: ./Frontend
+
+      # Step 4: Build the Vite project
+      - run: npm run build
+        working-directory: ./Frontend
+
+      # Step 5: Deploy to GitHub Pages
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./Frontend/dist
